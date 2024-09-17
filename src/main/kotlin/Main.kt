@@ -17,7 +17,7 @@ fun main() {
       response.body!!.string()
     }
   }.let {
-    Json.decodeFromString<IPAPIResponse>(it)
+    Json.decodeFromString<IPAPIResponseDTO>(it)
   }
 
   println(ip)
