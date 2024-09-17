@@ -1,3 +1,8 @@
 package org.example
 
-data class IPResponse()
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class IPAPIResponse(val ip: String) {
+  override fun toString() = ip
+}
