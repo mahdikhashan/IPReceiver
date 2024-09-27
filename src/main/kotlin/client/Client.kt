@@ -4,23 +4,32 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 
-interface HTTPClient {
-  fun get(URL: String) : String
+interface IHTTPClient
+
+abstract class AbstractHTTPClient : IHTTPClient {
+  abstract fun get(url: String) : String
 }
 
-abstract class HTTPClientImpl : HTTPClient
-
-object OKHTTPWrapper : HTTPClientImpl() {
+class OKHTTPClient : AbstractHTTPClient() {
 
   private val client = OkHttpClient()
 
-  override fun get(URL: String) = with(client) {
-    newCall(Request.Builder().url(URL).build()).execute().use { response ->
-      if (!response.isSuccessful) throw OKHTTPException("Unexpected code $response")
+  override fun get(url: String) = with(client) {
+    newCall(Request.Builder().url(url).build()).execute().use { response ->
+      if (!response.isSuccessful) throw OKHTTPClientException("Unexpected code $response")
 
       response.body!!.string()
     }
   }
 }
 
-class OKHTTPException(name: String) : IOException(name)
+class OKHTTPClientException(name: String) : IOException(name)
+
+object ClientFactory {
+  fun getHttpClient(clientName: Clients): AbstractHTTPClient = when (clientName) {
+    Clients.OKHttp -> OKHTTPClient()
+  }
+}
+
+val defaultHttpClient = Clients.OKHttp
+val httpClient = ClientFactory.getHttpClient(defaultHttpClient)
